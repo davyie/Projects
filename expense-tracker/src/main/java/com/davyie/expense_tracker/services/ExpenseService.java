@@ -9,6 +9,7 @@ import com.davyie.expense_tracker.storages.ExpenseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class ExpenseService {
@@ -48,8 +49,9 @@ public class ExpenseService {
         return expenseList;
     }
 
-    public ExpenseModel getExpenseById(Integer index) {
-        return expenseList.get(index);
+    public ExpenseModel getExpenseById(Integer id) {
+        ExpenseModel expenseModel = expenseList.stream().filter(e -> Objects.equals(e.getId(), id)).findFirst().orElse(null);
+        return expenseModel;
     }
 
     public boolean deleteExpenseByName(String expenseName) {
