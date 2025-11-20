@@ -5,7 +5,7 @@ get_options() {
     echo "2. Delete Expense"
     echo "3. Update Expense"
     echo "4. Get All Expenses"
-    echo "5. Get Expense by Name"
+    echo "5. Get Expense by ID"
     echo "6. Save" 
     echo "7. Save and Exit" 
 }
@@ -47,15 +47,59 @@ add_expense() {
     echo "Please enter expense description" 
     read DESCRIPTION
     json=$(json_object name $NAME amount $AMOUNT description DESCRIPTION)
+    echo $json
     ./add_expense.sh $json
 }
 
 delete_expense() {
-  json_data=$(./get_all.sh) 
-  echo "$json_data" | jq -r '.[].name'
+  display_expenses
   echo "Please enter the name of expense you want to delete"
   read name
   ./delete_expense.sh $name 
+}
+
+display_expenses() {
+  json_data=$(./get_all.sh) 
+  echo "ID Name"
+  echo "$json_data" | jq -r '.[] | "\(.id) \(.name)"'
+}
+
+update_expense() {
+  display_expenses
+  echo "Please enter the id of expense to be update" 
+  read EXPENSE_ID
+  data=$(get_expense_by_id $EXPENSE_ID)
+  NAME=$(echo "$data" | jq -r '.name')
+  AMOUNT=$(echo "$data" | jq -r '.amount')
+  DESCRIPTION=$(echo "$data" | jq -r '.description')
+  echo "What do you want to edit?"
+  echo "1) name"
+  echo "2) amount"
+  echo "3) description"
+  read OPTION 
+  case $OPTION in 
+    1) echo "Edit name"
+    read $NAME
+    ;;
+    2) echo "Edit amount"
+    read $AMOUNT
+    ;;
+    3) echo "Edit description"
+    read $DESCRIPTION
+    ;;
+    *) echo "Invalid option"
+    ;;
+    esac
+    echo $AMOUNT
+    json=$(json_object name $NAME amount $AMOUNT description $DESCRIPTION)
+    echo $json
+    ./update_expense.sh $EXPENSE_ID json
+    echo "Updated with the data $json"
+}
+
+get_expense_by_id() {
+  data=$(./get_expense_by_id.sh $1)
+  echo $data 
 }
 
 
@@ -70,11 +114,11 @@ do
         ;;
         2) delete_expense
         ;; 
-        3) echo "Not implemented"
+        3) update_expense
         ;; 
         4) ./get_all.sh
         ;; 
-        5) echo "Not implemented"
+        5) get_expense_by_id
         ;; 
         6) echo "Not implemented"
         ;; 

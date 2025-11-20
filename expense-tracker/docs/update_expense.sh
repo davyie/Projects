@@ -1,8 +1,5 @@
-curl -X PUT http://localhost:8080/command/update \
+ID=$1
+INPUT=$2
+curl -X PUT http://localhost:8080/command/update?id=$ID \
      -H "Content-Type: application/json" \
-     -d '{
-           "id": 1,
-           "name": "Sample Name",
-           "amount": 30.2,
-           "description": "New description text"
-         }'
+     -d "$INPUT"
