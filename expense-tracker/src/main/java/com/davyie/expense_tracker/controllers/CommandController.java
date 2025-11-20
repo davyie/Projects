@@ -1,7 +1,9 @@
 package com.davyie.expense_tracker.controllers;
 
+import com.davyie.expense_tracker.DTO.ExpenseModelDTO;
 import com.davyie.expense_tracker.models.ExpenseModel;
 import com.davyie.expense_tracker.services.ExpenseService;
+import jakarta.websocket.server.PathParam;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,8 @@ public class CommandController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addExpenseModel(@RequestBody ExpenseModel expense) {
-        expenseService.addExpense(expense);
+    public ResponseEntity<String> addExpenseModel(@RequestBody ExpenseModelDTO expenseDTO) {
+        expenseService.addExpense(expenseDTO);
         return new ResponseEntity("Successful add", HttpStatus.OK);
     }
 
@@ -30,8 +32,8 @@ public class CommandController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<String> updateExpense(@RequestBody ExpenseModel expenseModel) {
-        expenseService.updateExpense(expenseModel);
+    public ResponseEntity<String> updateExpense(@RequestBody ExpenseModelDTO dto, @RequestParam Integer id) {
+        expenseService.updateExpense(dto, id);
         return new ResponseEntity<>("Successful Update", HttpStatus.OK);
     }
 }
