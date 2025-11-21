@@ -46,7 +46,7 @@ add_expense() {
     read AMOUNT
     echo "Please enter expense description" 
     read DESCRIPTION
-    json=$(json_object name $NAME amount $AMOUNT description DESCRIPTION)
+    json=$(json_object name $NAME amount $AMOUNT description $DESCRIPTION)
     echo $json
     ./add_expense.sh $json
 }
@@ -79,21 +79,20 @@ update_expense() {
   read OPTION 
   case $OPTION in 
     1) echo "Edit name"
-    read $NAME
+    read NAME
     ;;
     2) echo "Edit amount"
-    read $AMOUNT
+    read AMOUNT
     ;;
     3) echo "Edit description"
-    read $DESCRIPTION
+    read DESCRIPTION
     ;;
     *) echo "Invalid option"
     ;;
     esac
-    echo $AMOUNT
     json=$(json_object name $NAME amount $AMOUNT description $DESCRIPTION)
     echo $json
-    ./update_expense.sh $EXPENSE_ID json
+    ./update_expense.sh $EXPENSE_ID $json
     echo "Updated with the data $json"
 }
 
