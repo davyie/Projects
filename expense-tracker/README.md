@@ -35,8 +35,20 @@ If you manually switch to a different parent and actually want the inheritance, 
 * Maven 
 * Java 21 
 * Docker Engine
-* Docker Desktop 
+* Docker Desktop
+* Unix environment 
 
 ### How to Build 
 To build the project, ensure that Docker Desktop is up and running or equivalent Docker engine. Run the command `mvn clean install`. The command produces a docker image named `expense-tracker:latest` which is used in `docker-compose.yml. 
 run `docker compose up -d` to create a container from the newly created docker image. 
+
+### Capabilities of Expense Tracker 
+The functionality of the software is to 
+- [x] add expense 
+- [x] update expense
+- [x] delete expense 
+- [] save expenses 
+
+### Learning objectives 
+The project has been created to expand my knowledge within the Java echo system by exploring Spring, Spring Boot, Docker and Unix-shell scripting. 
+The backend is built in Java using Spring Boot. The frontend is built using shell scripts. The backend is deployed using Docker containers. 
