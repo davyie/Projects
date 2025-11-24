@@ -47,8 +47,13 @@ The functionality of the software is to
 - [x] add expense 
 - [x] update expense
 - [x] delete expense 
-- [] save expenses 
+- [x] save expenses 
 
 ### Learning objectives 
 The project has been created to expand my knowledge within the Java echo system by exploring Spring, Spring Boot, Docker and Unix-shell scripting. 
-The backend is built in Java using Spring Boot. The frontend is built using shell scripts. The backend is deployed using Docker containers. 
+The backend is built in Java using Spring Boot. The frontend is built using shell scripts. The backend is deployed using Docker containers. The long-term storage is solved by using MongoDB in a docker container.
+This means that if the application is closed down the data is stored in Mongo DB. 
+
+
+### Architecture 
+![My Image](images/architecture.png)
