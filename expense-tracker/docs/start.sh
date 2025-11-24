@@ -101,9 +101,18 @@ get_expense_by_id() {
   echo $data 
 }
 
+get_all() {
+  data=$(./get_all.sh)
+  echo "$data" | jq -r '
+  (.[0] | keys_unsorted) as $keys |
+  ( $keys | join("\t") ),
+  ( .[] | [.[$keys[]]] | join("\t") )
+' | column -t
+}
+
 
 INPUT_STR=0
-
+./load_expenses.sh
 while [ "$INPUT_STR" != 7 ] 
 do 
     get_options
@@ -115,13 +124,15 @@ do
         ;; 
         3) update_expense
         ;; 
-        4) ./get_all.sh
+        4) get_all
         ;; 
         5) get_expense_by_id
         ;; 
-        6) echo "Not implemented"
+        6) ./save_expenses.sh
         ;; 
-        7) echo "Saving... Good bye!"
+        7)
+        ./save_expenses.sh 
+        echo "Saving... Good bye!"
         ;;  
         *) echo "Invalid option"
         ;;
