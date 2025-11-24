@@ -41,4 +41,17 @@ public class CommandController {
         expenseService.updateExpense(dto, id);
         return new ResponseEntity<>("Successful Update", HttpStatus.OK);
     }
+
+
+    @PostMapping("/save")
+    public ResponseEntity<Boolean> saveExpenses() {
+        expenseService.save();
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
+    @PostMapping("/load")
+    public ResponseEntity<String> loadExpenses() {
+        expenseService.load();
+        return new ResponseEntity<>("Data found. Loading...", HttpStatus.OK);
+    }
 }

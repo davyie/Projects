@@ -1,11 +1,18 @@
 package com.davyie.expense_tracker.services;
 
 import com.davyie.expense_tracker.DTO.ExpenseModelDTO;
+import com.davyie.expense_tracker.models.Counter;
 import com.davyie.expense_tracker.models.ExpenseModel;
+import com.davyie.expense_tracker.storages.CounterRepository;
+import com.davyie.expense_tracker.storages.ExpenseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import com.davyie.expense_tracker.storages.ExpenseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,21 +24,36 @@ public class ExpenseService {
     // Fields
     private List<ExpenseModel> expenseList;
 
-    private Integer expenseID;
+    private ExpenseRepository expenseRepository;
 
-    private ExpenseStorage expenseStorage;
+    private CounterRepository counterRepository;
+
+    private MongoOperations mongoOperations;
 
     private Logger LOG = LoggerFactory.getLogger(ExpenseService.class);
 
-    public ExpenseService(ExpenseStorage expenseStorage) {
-        this.expenseStorage = expenseStorage;
+    public ExpenseService(ExpenseRepository expenseRepository,
+                          CounterRepository counterRepository,
+                          MongoOperations mongoOperations) {
+        this.expenseRepository = expenseRepository;
+        this.counterRepository = counterRepository;
+        this.mongoOperations = mongoOperations;
         this.expenseList = new ArrayList<>();
-        this.expenseID = 0;
+    }
+
+    private Integer getId() {
+        Counter counter = mongoOperations.findAndModify(
+                Query.query(Criteria.where("_id").is("global_id")),
+                new Update().inc("expenseId", 1),
+                FindAndModifyOptions.options().returnNew(true).upsert(true),
+                Counter.class);
+
+        return counter != null ? counter.getExpenseId() : 1;
     }
 
     public boolean addExpense(ExpenseModelDTO expenseDTO) {
-        ExpenseModel expense = new ExpenseModel(expenseID, expenseDTO.getName(), expenseDTO.getAmount(), expenseDTO.getDescription());
-        expenseID++;
+        Integer i = getId();
+        ExpenseModel expense = new ExpenseModel(i, expenseDTO.getName(), expenseDTO.getAmount(), expenseDTO.getDescription());
         return expenseList.add(expense);
     }
 
@@ -55,20 +77,26 @@ public class ExpenseService {
     }
 
     public boolean deleteExpenseByName(String expenseName) {
-        LOG.info("Delete expense with name: {}", expenseName);
         expenseList = new ArrayList<>(
                 expenseList.stream()
                         .filter(e -> !e.getName().equals(expenseName))
                         .toList());
         return true;
     }
-
+    // Delegates in C#
     public boolean deleteExpenseById(Integer id) {
-        expenseList = new ArrayList<>(
-                expenseList.stream()
-                        .filter(e -> e.getId() != id)
-                        .toList()
-        );
+        return expenseList.remove(id);
+    }
+
+    public boolean save() {
+        // method to save
+        expenseRepository.deleteAll();
+        expenseRepository.saveAll(expenseList);
         return true;
+    }
+
+    public List<ExpenseModel> load() {
+        this.expenseList = new ArrayList<>(expenseRepository.findAll());
+        return this.expenseList;
     }
 }
