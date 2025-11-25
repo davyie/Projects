@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CachineProxyApplication {
+public class CachingProxyApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CachineProxyApplication.class, args);
+		SpringApplication.run(CachingProxyApplication.class, args);
 	}
-
 }

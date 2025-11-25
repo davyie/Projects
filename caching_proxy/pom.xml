@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.roadmap</groupId>
-	<artifactId>cachine_proxy</artifactId>
+	<artifactId>caching_proxy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>cachine_proxy</name>
+	<name>caching_proxy</name>
 	<description>This is a project about Caching Proxy. The idea is to cache responses from a website and use that to respond to requests towards our servers. </description>
 	<url/>
 	<licenses>
@@ -34,6 +34,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
