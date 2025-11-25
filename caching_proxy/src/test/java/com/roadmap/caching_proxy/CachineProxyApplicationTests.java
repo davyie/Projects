@@ -1,4 +1,4 @@
-package com.roadmap.cachine_proxy;
+package com.roadmap.caching_proxy;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

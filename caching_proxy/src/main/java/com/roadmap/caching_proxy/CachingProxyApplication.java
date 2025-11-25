@@ -1,4 +1,4 @@
-package com.roadmap.cachine_proxy;
+package com.roadmap.caching_proxy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
