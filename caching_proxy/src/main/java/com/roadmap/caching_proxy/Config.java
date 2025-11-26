@@ -1,7 +1,10 @@
 package com.roadmap.caching_proxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.cache.interceptor.SimpleCacheResolver;
@@ -30,7 +33,11 @@ import java.util.function.BiFunction;
 import static com.roadmap.caching_proxy.CacheHeader.MISS;
 
 @Configuration
+@EnableCaching
 public class Config {
+
+    private Logger LOG = LoggerFactory.getLogger(Config.class);
+
     @Value("${global.origin}") // Fetch this value from application.properties
     private String origin;
 
@@ -41,6 +48,7 @@ public class Config {
 
     @Bean
     public CacheResolver cacheResolver(CacheManager cacheManager) {
+        LOG.info("CustomCacheResolver initialized");
         return new CustomCacheResolver(new SimpleCacheResolver(cacheManager));
     }
 

@@ -1,9 +1,7 @@
 package com.roadmap.caching_proxy;
 
-
 import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 import org.springframework.cache.interceptor.CacheResolver;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
 

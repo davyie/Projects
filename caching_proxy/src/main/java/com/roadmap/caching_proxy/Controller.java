@@ -15,7 +15,7 @@ public class Controller {
     }
 
     @GetMapping("/products")
-    @Cacheable(cacheNames = "customCache", cacheResolver = "cacheResolver", key = "#root.methodname")
+    @Cacheable(cacheNames = "customCache", cacheResolver = "cacheResolver", key = "#root.methodName")
     public ResponseEntity<String> products() {
         return proxyService.getProducts();
     }
