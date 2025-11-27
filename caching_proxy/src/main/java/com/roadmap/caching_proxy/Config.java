@@ -1,10 +1,14 @@
 package com.roadmap.caching_proxy;
 
+import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.cache.interceptor.SimpleCacheResolver;
@@ -28,13 +32,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 import static com.roadmap.caching_proxy.CacheHeader.MISS;
 
 @Configuration
 @EnableCaching
-public class Config {
+public class Config implements CachingConfigurer {
 
     private Logger LOG = LoggerFactory.getLogger(Config.class);
 
@@ -43,7 +48,21 @@ public class Config {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("customCache");
+        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager() {
+            @Override
+            protected Cache createConcurrentMapCache(final String name) {
+                return new ConcurrentMapCache(
+                        name,
+                        CacheBuilder.newBuilder()
+                                .expireAfterWrite(5, TimeUnit.SECONDS)
+                                .maximumSize(100)
+                                .build()
+                                .asMap(),
+                        false
+                );
+            }
+        };
+        return cacheManager;
     }
 
     @Bean
@@ -119,12 +138,17 @@ public class Config {
                                                 @NonNull final byte[] body,
                                                 @NonNull final ClientHttpRequestExecution execution) throws IOException {
                 ClientHttpResponse resp = execution.execute(request, body);
+                LOG.info("This is the status code from execute() {} ", resp.getStatusCode().toString());
                 while (resp.getStatusCode().is3xxRedirection()) {
                     final var location = resp.getHeaders().getLocation().toString();
+                    LOG.info(location);
                     final URI uri = UriComponentsBuilder.fromUriString(location).build().toUri();
-                    final var newRequest = createNewRequest.apply(request, uri);
+                    final var newRequest = createNewRequest.apply(request, uri); //
+                    LOG.info("new URI: {}", uri.toString());
+                    LOG.info("This is the status code from createNewRequest.apply() {} ", resp.getStatusCode().toString());
                     resp = execution.execute(newRequest, body);
                 }
+                LOG.info("This is the status code after everything {} ", resp.getStatusCode().toString());
                 return getResponseWithXCacheMissHeader(resp);
             }
         };
@@ -153,11 +177,22 @@ public class Config {
         return RestClientAdapter.create(restClient);
     }
 
+    /**
+     * This is a method to create a proxy bean for RestClient.
+     * @param adapter
+     * @return
+     */
     @Bean
     public HttpServiceProxyFactory httpServiceProxyFactory(RestClientAdapter adapter) {
         return HttpServiceProxyFactory.builderFor(adapter).build();
     }
 
+    /**
+     * This is literally the bean creation for our ProxyService. It makes use of the Factory to produce a valid bean which
+     * we can use in our code.
+     * @param httpServiceProxyFactory
+     * @return
+     */
     @Bean
     public ProxyService proxyService(HttpServiceProxyFactory httpServiceProxyFactory) {
         return httpServiceProxyFactory.createClient(ProxyService.class);

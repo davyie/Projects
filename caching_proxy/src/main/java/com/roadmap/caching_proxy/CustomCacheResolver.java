@@ -7,6 +7,9 @@ import java.util.Collection;
 
 public class CustomCacheResolver implements CacheResolver {
 
+
+    private static final int DEFAULT_TTL = 30;
+
     private CacheResolver delegate;
 
     public CustomCacheResolver(CacheResolver cacheResolver) {
