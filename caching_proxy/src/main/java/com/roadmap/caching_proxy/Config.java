@@ -46,6 +46,8 @@ public class Config implements CachingConfigurer {
     @Value("${global.origin}") // Fetch this value from application.properties
     private String origin;
 
+    private final int TTL = 5;
+
     @Bean
     public CacheManager cacheManager() {
         ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager() {
@@ -54,7 +56,7 @@ public class Config implements CachingConfigurer {
                 return new ConcurrentMapCache(
                         name,
                         CacheBuilder.newBuilder()
-                                .expireAfterWrite(5, TimeUnit.SECONDS)
+                                .expireAfterWrite(TTL, TimeUnit.SECONDS)
                                 .maximumSize(100)
                                 .build()
                                 .asMap(),
