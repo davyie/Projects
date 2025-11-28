@@ -1,6 +1,5 @@
-https://roadmap.sh/projects/expense-tracker
-
 # Getting Started
+https://roadmap.sh/projects/expense-tracker
 
 ### Reference Documentation
 For further reference, please consider the following sections:
