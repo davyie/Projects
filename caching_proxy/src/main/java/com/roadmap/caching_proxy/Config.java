@@ -116,6 +116,7 @@ public class Config implements CachingConfigurer {
 
             @Override
             public URI getURI() {
+                LOG.info(uri.toString());
                 return uri;
             }
 
@@ -139,15 +140,14 @@ public class Config implements CachingConfigurer {
             public ClientHttpResponse intercept(@NonNull final HttpRequest request,
                                                 @NonNull final byte[] body,
                                                 @NonNull final ClientHttpRequestExecution execution) throws IOException {
-                ClientHttpResponse resp = execution.execute(request, body);
+                ClientHttpResponse resp = execution.execute(request, body); // This passes the request to next interceptor or HTTP client. statusCode could be 3XX.
                 LOG.info("This is the status code from execute() {} ", resp.getStatusCode().toString());
+                LOG.info(request.getHeaders().toString());
                 while (resp.getStatusCode().is3xxRedirection()) {
                     final var location = resp.getHeaders().getLocation().toString();
-                    LOG.info(location);
                     final URI uri = UriComponentsBuilder.fromUriString(location).build().toUri();
-                    final var newRequest = createNewRequest.apply(request, uri); //
-                    LOG.info("new URI: {}", uri.toString());
-                    LOG.info("This is the status code from createNewRequest.apply() {} ", resp.getStatusCode().toString());
+                    final var newRequest = createNewRequest.apply(request, uri);
+                    LOG.info(newRequest.getHeaders().toString());
                     resp = execution.execute(newRequest, body);
                 }
                 LOG.info("This is the status code after everything {} ", resp.getStatusCode().toString());
