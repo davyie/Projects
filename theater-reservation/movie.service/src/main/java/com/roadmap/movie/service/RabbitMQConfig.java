@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,11 +12,21 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     /**
-     * Swap the names in the future
+     * Swap the names in the future. Store them in application.properties
      */
     private String exchange = "exchange";
     private String queue = "queue";
     private String routingKey = "routingKey";
+
+    private String replyQueue = "replyQueue";
+    private String replyExchange = "replyExchange";
+    private String replyRoutingKey = "replyRoutingKey";
+
+
+    @Bean
+    public JacksonJsonMessageConverter jacksonJsonMessageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
 
     @Bean
     public Queue queue() {
@@ -30,5 +41,20 @@ public class RabbitMQConfig {
     @Bean
     public Binding queueBinding() {
         return BindingBuilder.bind(queue()).to(directExchange()).with(routingKey);
+    }
+
+    @Bean
+    public Queue replyQueue() {
+        return new Queue(replyQueue);
+    }
+
+    @Bean
+    public DirectExchange replyExchange() {
+        return new DirectExchange(replyExchange);
+    }
+
+    @Bean
+    public Binding replyBinding() {
+        return BindingBuilder.bind(replyQueue()).to(replyExchange()).with(replyRoutingKey);
     }
 }

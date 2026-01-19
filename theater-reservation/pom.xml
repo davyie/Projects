@@ -22,6 +22,7 @@
 		<module>schedule.service</module>
 		<module>user.service</module>
 		<module>movie.service</module>
+        <module>rabbitmq</module>
     </modules>
 	<url/>
 	<licenses>
