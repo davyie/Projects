@@ -1,14 +1,117 @@
 services:
-  mysql:
-    container_name: 'guide-mysql'
-    image: 'mysql:latest'
+  theater-app:
+    image: theater-app:1.0.0
+    container_name: theater-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - net-app
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
+      # This overrides the ${MYSQL_HOST} variable in application.properties
+      - MYSQL_HOST=mysql
+      - PORT=3306
+  mysql:
+    container_name: 'mysql-db'
+    image: 'mysql:latest'
+    networks:
+      - net-app
+    environment:
+      - 'MYSQL_DATABASE=appdb'
       - 'MYSQL_PASSWORD=secret'
       - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      - 'MYSQL_USER=user'
     ports:
       - '3306:3306'
+  user-service:
+    image: user.service:1.0.0
+    container_name: user-db-service
+    networks:
+      - net-user
+    depends_on:
+      - mysql-user
+    environment:
+      # This overrides the ${MYSQL_HOST} variable in application.properties
+      - MYSQL_HOST=mysql-user
+      - PORT=3306
+  mysql-user:
+    container_name: 'mysql-db-users'
+    image: 'mysql:latest'
+    networks:
+      - net-user
+    environment:
+      - 'MYSQL_DATABASE=userdb'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=user'
+
+  schedule-service:
+    image: schedule.service:1.0.0
+    container_name: schedule-service
+    networks:
+      - net-schedule
+    depends_on:
+      - mysql-schedule
+    environment:
+      # This overrides the ${MYSQL_HOST} variable in application.properties
+      - MYSQL_HOST=mysql-schedule
+      - PORT=3306
+  mysql-schedule:
+    container_name: 'mysql-db-schedule'
+    image: 'mysql:latest'
+    networks:
+      - net-schedule
+    environment:
+      - 'MYSQL_DATABASE=scheduledb'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=user'
+
+  movie-service:
+    image: movie.service:1.0.0
+    container_name: movie-service
+    networks:
+      - net-movie
+    depends_on:
+      - mysql-movies
+    environment:
+      # This overrides the ${MYSQL_HOST} variable in application.properties
+      - MYSQL_HOST=mysql-movies
+      - PORT=3306
+  mysql-movies:
+    container_name: 'mysql-db-movies'
+    image: 'mysql:latest'
+    networks:
+      - net-movie
+    environment:
+      - 'MYSQL_DATABASE=moviedb'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=user'
+
+  booking-service:
+    image: booking.service:1.0.0
+    container_name: booking-service
+    networks:
+      - net-booking
+    depends_on:
+      - mysql-booking
+    environment:
+      # This overrides the ${MYSQL_HOST} variable in application.properties
+      - MYSQL_HOST=mysql-db-booking
+      - PORT=3306
+  mysql-booking:
+    container_name: 'mysql-db-booking'
+    image: 'mysql:latest'
+    networks:
+      - net-booking
+    environment:
+      - 'MYSQL_DATABASE=bookingdb'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=user'
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -19,3 +122,13 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
+
+networks:
+  net-app:
+  net-user:
+  net-booking:
+  net-schedule:
+  net-movie:
+
+
+
