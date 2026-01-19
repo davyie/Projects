@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.roadmap</groupId>
 	<artifactId>theater-reservation</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>theater-reservation</name>
 
 	<description>A project to construct backend for theather reservation system. </description>
@@ -18,6 +18,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>theater-app</module>
+		<module>booking.service</module>
+		<module>schedule.service</module>
+		<module>user.service</module>
+		<module>movie.service</module>
     </modules>
 	<url/>
 	<licenses>
@@ -40,10 +44,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-security</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>

@@ -9,5 +9,4 @@ public class TheaterApp {
 	public static void main(String[] args) {
 		SpringApplication.run(TheaterApp.class, args);
 	}
-
 }
