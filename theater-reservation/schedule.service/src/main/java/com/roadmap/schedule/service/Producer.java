@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import replys.Reply;
 import requests.Request;
 
 @Service
@@ -17,10 +18,10 @@ public class Producer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendMessage(Request request) {
+    public Reply sendMessage(Request request) {
         LOG.info(request.toString());
         LOG.info("The correlationId for outbound message: " + request.getCorrelationId());
-        rabbitTemplate.convertAndSend(
+        return (Reply) rabbitTemplate.convertSendAndReceive(
                 "exchange",
                 "routingKey",
                 request

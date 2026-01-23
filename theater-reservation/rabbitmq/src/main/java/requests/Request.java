@@ -16,7 +16,7 @@ public class Request {
     private String message;
     private RequestType requestType;
     private Set<Service> services;
-    private Map<String, Object> payload;
+    private Object payload;
 
     @Override
     public String toString() {
