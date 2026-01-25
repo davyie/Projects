@@ -8,18 +8,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="theater-app" />
-        <module name="rabbitmq" />
-        <module name="common-lib" />
       </profile>
       <profile name="Annotation profile for theater-reservation" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="user.service" />
+        <module name="common-lib" />
         <module name="movie.service" />
+        <module name="rabbitmq" />
         <module name="schedule.service" />
         <module name="booking.service" />
       </profile>
