@@ -64,25 +64,8 @@ public class ScheduleService {
         return producer.sendMessage(request);
     }
 
-    /**
-     * 2026-01-23 Replace Listener and CompletableFuture with Request/Reply Messaging using Spring.
-     *
-     * @return
-     */
-//    @RabbitListener(queues = "replyQueue")
-//    public void receive(Reply reply) {
-//        LOG.info("Receive reply");
-//        if(reply.getCorrelationId() != null) {
-//            CompletableFuture<Reply> future = concurrentMap.remove(reply.getCorrelationId());
-//            if (future != null) {
-//                LOG.info("Make the future complete");
-//                future.complete(reply);
-//            }
-//        }
-//    }
-
     @Transactional
-    public TimeSlotEntity addTimeSlot(Long scheduleId, TimeSlotDTO timeSlotDTO) {
+    public TimeSlotEntity addTimeSlot(Long scheduleId, TimeSlotDTO timeSlotDTO) throws RuntimeException {
         TimeSlotEntity timeslot = objectMapper.convertValue(timeSlotDTO, TimeSlotEntity.class);
         ScheduleEntity schedule = null;
         try {
@@ -98,7 +81,7 @@ public class ScheduleService {
 
         timeslot.setSchedule(schedule);
 
-        if (schedule.addTimeSlot(timeslot) == null) {return null;};
+        schedule.addTimeSlot(timeslot);
         scheduleRepository.save(schedule);
         LOG.info("Added Timeslot to List<> and added it to schedule object. Saved it to database.");
         return timeslot;
