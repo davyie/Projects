@@ -1,5 +1,7 @@
 package com.roadmap.schedule.service;
 
+import com.roadmap.schedule.service.exceptions.DuplicateEntryException;
+import com.roadmap.schedule.service.exceptions.OverlappingException;
 import dto.ScheduleDTO;
 import dto.TimeSlotDTO;
 import org.apache.coyote.Response;
@@ -8,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 @RestController
@@ -36,36 +40,18 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule/{movieId}")
-    public ResponseEntity<ScheduleEntity> createSchedule(@PathVariable Long movieId) {
-        try {
-            ScheduleEntity schedule = scheduleService.createSchedule(movieId);
-
-            if (schedule == null) {
-                // This covers the case where the schedule already exists
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-
-            return ResponseEntity.ok(schedule);
-
-        } catch (RuntimeException e) {
-            // This catches the "Movie does not exist!" error from our logic
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (TimeoutException e) {
-            // This catches the case where RabbitMQ/Movie Service didn't reply in time
-            return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).build();
-        } catch (Exception e) {
-            // General error handling
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<ScheduleEntity> createSchedule(@PathVariable Long movieId) throws DuplicateEntryException {
+        ScheduleEntity schedule = scheduleService.createSchedule(movieId);
+        return ResponseEntity.status(HttpStatus.OK).body(schedule);
     }
 
     @DeleteMapping("/schedule")
     public ResponseEntity<String> deleteSchedule(@RequestParam Long scheduleId) {
 
         if (scheduleService.deleteScheduleById(scheduleId)) {
-            return ResponseEntity.status(HttpStatus.OK).body("Succesful!");
+            return ResponseEntity.status(HttpStatus.OK).body("Successful!");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body("Unsuccesful!");
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body("Unsuccessful!");
         }
     }
 
@@ -82,9 +68,7 @@ public class ScheduleController {
     public ResponseEntity<TimeSlotEntity> addTimeSlot(@RequestParam Long scheduleId, @RequestBody TimeSlotDTO timeSlotDTO) {
 
         TimeSlotEntity entity = scheduleService.addTimeSlot(scheduleId, timeSlotDTO);
-        System.out.println(entity);
-        if (entity == null) {return ResponseEntity.status(HttpStatus.CONFLICT).body(null);}
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(entity);
     }
 
     @DeleteMapping("/timeslot")
@@ -95,5 +79,10 @@ public class ScheduleController {
             return ResponseEntity.status(HttpStatus.OK).body("Succesful!");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Timeslot not found");
+    }
+
+    @GetMapping("/error")
+    public ResponseEntity<String> errorEndpoint() throws RuntimeException {
+        throw new RuntimeException("error endpoint");
     }
 }

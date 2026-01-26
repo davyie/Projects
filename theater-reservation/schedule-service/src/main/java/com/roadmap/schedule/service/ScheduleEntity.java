@@ -2,6 +2,7 @@ package com.roadmap.schedule.service;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.roadmap.schedule.service.exceptions.OverlappingException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,12 +25,12 @@ public class ScheduleEntity {
     @JsonManagedReference
     private List<TimeSlotEntity> timeSlotList;
 
-    public TimeSlotEntity addTimeSlot(TimeSlotEntity timeSlot) {
+    public TimeSlotEntity addTimeSlot(TimeSlotEntity timeSlot) throws OverlappingException {
         List<TimeSlotEntity> list = this.timeSlotList.stream()
                 .filter(ts -> ts.getDate() != timeSlot.getDate() && ts.isOverlapping(timeSlot))
                 .toList();
         if( list.size() == 0 ) {
-            throw new RuntimeException("Conflict! Interval exists on the given date " +timeSlot.getDate());
+            throw new OverlappingException("Conflict! Interval exists on the given date " + timeSlot.getDate());
         }
 
         this.timeSlotList.add(timeSlot);

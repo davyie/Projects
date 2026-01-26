@@ -1,9 +1,12 @@
 package com.roadmap.schedule.service;
 
+import com.roadmap.schedule.service.exceptions.DuplicateEntryException;
+import com.roadmap.schedule.service.exceptions.OverlappingException;
 import dto.ScheduleDTO;
 import dto.TimeSlotDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import replys.Reply;
@@ -11,6 +14,7 @@ import requests.Request;
 import requests.RequestType;
 import tools.jackson.databind.ObjectMapper;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -34,14 +38,14 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleEntity createSchedule(Long movieId) throws ExecutionException, InterruptedException, TimeoutException {
+    public ScheduleEntity createSchedule(Long movieId) throws DuplicateEntryException {
         // 2, check if movie id exists. Send message to movie service
         Reply reply = sendMessage(movieId);
         LOG.info(reply.getPayload().toString());
 
         // 1, check if a schedule for movie exists
         LOG.info("Check if we have a schedule with the movieId");
-        if (scheduleRepository.findByMovieId(movieId) != null) { return null; }
+        if (scheduleRepository.existsByMovieId(movieId)) {throw new DuplicateEntryException("Schedule for the movie exists");}
 
         // 3, create the schedule
         ScheduleEntity schedule = new ScheduleEntity();
@@ -65,23 +69,18 @@ public class ScheduleService {
     }
 
     @Transactional
-    public TimeSlotEntity addTimeSlot(Long scheduleId, TimeSlotDTO timeSlotDTO) throws RuntimeException {
+    public TimeSlotEntity addTimeSlot(Long scheduleId, TimeSlotDTO timeSlotDTO) {
+
         TimeSlotEntity timeslot = objectMapper.convertValue(timeSlotDTO, TimeSlotEntity.class);
-        ScheduleEntity schedule = null;
-        try {
-            schedule = scheduleRepository.findById(scheduleId).orElseThrow();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        ScheduleEntity schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchElementException("No object is found with schedule id: " + scheduleId));
 
         List<TimeSlotEntity> timeslots = schedule.getTimeSlotList();
-        if (timeslots == null) {
-            return timeslot;
-        }
+        if (timeslots == null) {return timeslot;}
 
         timeslot.setSchedule(schedule);
+        schedule.addTimeSlot(timeslot); // Throws exception
 
-        schedule.addTimeSlot(timeslot);
         scheduleRepository.save(schedule);
         LOG.info("Added Timeslot to List<> and added it to schedule object. Saved it to database.");
         return timeslot;
@@ -103,7 +102,7 @@ public class ScheduleService {
 
     public ScheduleEntity getScheduleByMovieId(Long movieId) {
         // Find schedule by movie id;
-        return scheduleRepository.findByMovieId(movieId);
+        return scheduleRepository.findByMovieId(movieId).orElseThrow(() -> new NoSuchElementException("No schedule related to movie id " + movieId));
     }
 
     public List<ScheduleEntity> getSchedules() {

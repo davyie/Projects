@@ -7,11 +7,11 @@
 		<artifactId>theater-reservation</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<groupId>com.roadmap</groupId>
-	<artifactId>movie.service</artifactId>
+
+	<artifactId>booking-service</artifactId>
 	<version>1.0.0</version>
-	<name>movie.service</name>
-	<description>This project handles command and queries regarding movies. </description>
+	<name>booking.service</name>
+	<description>This project handles command and queries regarding users. </description>
 	<url/>
 	<licenses>
 		<license/>
@@ -34,18 +34,6 @@
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 		</dependency>
-
-        <dependency>
-            <groupId>com.roadmap</groupId>
-            <artifactId>rabbitmq</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.roadmap</groupId>
-            <artifactId>common-lib</artifactId>
-            <version>1.0.0</version>
-        </dependency>
 	</dependencies>
 
 	<build>
@@ -66,16 +54,10 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
 					<image>
 						<name>${project.artifactId}:${project.version}</name>
 						<env>
-							<BP_JVM_VERSION>21</BP_JVM_VERSION>
+							<BP_JVM_VERSION>21</BP_JVM_VERSION> <!-- or use your ${java.version} property -->
 						</env>
 					</image>
 				</configuration>
