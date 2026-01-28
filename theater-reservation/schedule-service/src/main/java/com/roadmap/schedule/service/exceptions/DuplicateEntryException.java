@@ -1,6 +1,8 @@
 package com.roadmap.schedule.service.exceptions;
 
-public class DuplicateEntryException extends Exception {
+import org.springframework.dao.DataAccessException;
+
+public class DuplicateEntryException extends DataAccessException {
     public DuplicateEntryException(String message) {
         super(message);
     }

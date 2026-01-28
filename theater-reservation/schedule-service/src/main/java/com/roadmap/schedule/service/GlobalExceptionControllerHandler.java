@@ -66,7 +66,7 @@ public class GlobalExceptionControllerHandler {
     @ExceptionHandler(DuplicateEntryException.class)
     public ProblemDetail handleDuplicateEntry(DuplicateEntryException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_ACCEPTABLE,
+                HttpStatus.CONFLICT,
                 exception.getMessage()
         );
 

@@ -1,12 +1,10 @@
 package com.roadmap.schedule.service;
 
 import com.roadmap.schedule.service.exceptions.DuplicateEntryException;
-import com.roadmap.schedule.service.exceptions.OverlappingException;
 import dto.ScheduleDTO;
 import dto.TimeSlotDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import replys.Reply;
@@ -14,7 +12,6 @@ import requests.Request;
 import requests.RequestType;
 import tools.jackson.databind.ObjectMapper;
 
-import javax.management.InstanceAlreadyExistsException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -38,7 +35,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleEntity createSchedule(Long movieId) throws DuplicateEntryException {
+    public ScheduleEntity createSchedule(Long movieId) {
         // 2, check if movie id exists. Send message to movie service
         Reply reply = sendMessage(movieId);
         LOG.info(reply.getPayload().toString());
