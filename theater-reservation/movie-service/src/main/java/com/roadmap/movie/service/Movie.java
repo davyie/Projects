@@ -1,20 +1,17 @@
 package com.roadmap.movie.service;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Table("movies")
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private Long screenTime;
@@ -24,5 +21,10 @@ public class Movie {
         this.name = name;
         this.screenTime = screenTime;
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie: " + this.name + " ," + this.screenTime + " ," + this.description;
     }
 }

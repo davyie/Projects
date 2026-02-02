@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import replys.Reply;
 import replys.ReplyType;
 import requests.Request;
@@ -62,11 +63,6 @@ public class MovieConsumer {
         }
 
         return reply;
-//        rabbitTemplate.convertAndSend(
-//            "replyExchange",
-//                "replyRoutingKey",
-//                reply
-//        );
     }
 
     @Transactional
@@ -78,7 +74,7 @@ public class MovieConsumer {
         reply.setReplyType(ReplyType.GET_MOVIE_BY_ID);
         MovieDTO dto = null;
         try {
-            dto = movieMapper.toDto(movieRepository.findById(id).orElseThrow());
+            dto = movieMapper.toDto(movieRepository.findById(id).block());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,8 +90,7 @@ public class MovieConsumer {
         reply.setMessage("This is the reply from MovieConsumer to fetch all movies.");
         reply.setReplyType(ReplyType.GET_ALL_MOVIES);
 
-        List<MovieDTO> dtos = movieMapper.toDtoList(movieRepository.findAll());
-        reply.setPayload(dtos);
+//        reply.setPayload(dtos);
         return reply;
     }
 }
