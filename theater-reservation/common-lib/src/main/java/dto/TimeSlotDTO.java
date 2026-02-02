@@ -1,7 +1,6 @@
 package dto;
 
 import lombok.*;
-import org.hibernate.annotations.NotFound;
 
 import java.time.Duration;
 import java.time.Instant;
