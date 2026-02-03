@@ -1,16 +1,27 @@
 package com.roadmap.movie.service;
 
+import com.rabbitmq.client.AMQP;
 import dto.MovieDTO;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
+import replys.Reply;
+import replys.ReplyType;
+import requests.Request;
+import requests.RequestType;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.List;
+import java.util.UUID;
+
 
 /**
  * This is a class which handles most of the logic for communicating between
@@ -26,6 +37,7 @@ public class MovieService {
     private RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper;
+
 
     public MovieService(MovieRepository movieRepository,
                         RabbitTemplate rabbitTemplate,
@@ -84,11 +96,32 @@ public class MovieService {
                 });
     }
 
-    public void sendMessage() {
-        rabbitTemplate.convertAndSend(
-                "exchange",
-                "routingKey",
-                "Hello from Movie Service"
-        );
+    public Mono<Request> sendMessage() {
+        return Mono.fromRunnable(() -> {
+            rabbitTemplate.convertAndSend(
+                    "exchange",
+                    "routingKey",
+                    new Request(
+                            UUID.randomUUID().toString(),
+                            "This is a message from Movie Service",
+                            RequestType.GET_MOVIE_BY_ID,
+                            null,
+                            null
+                    )
+            );
+        })
+                .subscribeOn(Schedulers.boundedElastic())
+                .thenReturn(new Request(
+                        UUID.randomUUID().toString(),
+                        "This is a message from Movie Service",
+                        RequestType.GET_MOVIE_BY_ID,
+                        null,
+                        null
+                ));
+    }
+
+    @RabbitListener(queues = "replyQueue")
+    public void receive(Reply reply) {
+        LOG.info(reply.getMessage());
     }
 }

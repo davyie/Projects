@@ -3,8 +3,11 @@ package com.roadmap.movie.service;
 import dto.MovieDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Flux;
+import requests.Request;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Configuration
 public class Config {
@@ -22,5 +25,12 @@ public class Config {
                 return movies.stream().map(this::toDto).toList();
             }
         };
+    }
+
+    @Bean
+    public Consumer<Flux<Request>> processRequest(MovieRepository movieRepository) {
+        return requestFlux -> requestFlux
+                .doOnNext(request -> movieRepository.findById((Long) request.getPayload()))
+                .subscribe();
     }
 }
