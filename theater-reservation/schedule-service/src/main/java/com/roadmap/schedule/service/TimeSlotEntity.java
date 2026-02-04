@@ -1,24 +1,23 @@
 package com.roadmap.schedule.service;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table("timeslots")
 public class TimeSlotEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private LocalDate date;
@@ -26,8 +25,6 @@ public class TimeSlotEntity {
     private Duration duration;
     private Instant endTime;
 
-    @ManyToOne
-    @JoinColumn(name = "schedule_id")
     @JsonBackReference
     private ScheduleEntity schedule;
 

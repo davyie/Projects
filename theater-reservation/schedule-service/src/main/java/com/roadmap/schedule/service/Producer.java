@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import replys.Reply;
 import requests.Request;
 
@@ -18,13 +20,16 @@ public class Producer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public Reply sendMessage(Request request) {
+    public Mono<Reply> sendMessage(Request request) {
         LOG.info(request.toString());
         LOG.info("The correlationId for outbound message: " + request.getCorrelationId());
-        return (Reply) rabbitTemplate.convertSendAndReceive(
+        return Mono.fromCallable(() -> rabbitTemplate.convertSendAndReceive(
                 "exchange",
                 "routingKey",
                 request
-        );
+        ))
+                .subscribeOn(Schedulers.boundedElastic())
+            .doOnSuccess(v -> LOG.info("Sent message to exchange"))
+            .thenReturn(new Reply(request.getCorrelationId(), "Reply message from Schedule Producer", null, null));
     }
 }

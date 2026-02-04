@@ -8,6 +8,8 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,13 +27,13 @@ public class ScheduleController {
     }
 
     @GetMapping("/hello")
-    public ResponseEntity<String> helloWorld() {
-        return ResponseEntity.status(HttpStatus.OK).body("Hello from Schedule Service");
+    public Mono<String> helloWorld() {
+        return Mono.justOrEmpty("Hello World!");
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ScheduleEntity>> getAllSchedules() {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedules());
+    public Flux<ScheduleDTO> getAllSchedules() {
+        return scheduleService.getSchedules();
     }
 
     @GetMapping("/by/movie/{movieId}")
@@ -40,19 +42,13 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule/{movieId}")
-    public ResponseEntity<ScheduleEntity> createSchedule(@PathVariable Long movieId) throws DuplicateEntryException {
-        ScheduleEntity schedule = scheduleService.createSchedule(movieId);
-        return ResponseEntity.status(HttpStatus.OK).body(schedule);
+    public Mono<ScheduleDTO> createSchedule(@PathVariable Long movieId) throws DuplicateEntryException {
+        return scheduleService.createSchedule(movieId);
     }
 
     @DeleteMapping("/schedule")
-    public ResponseEntity<String> deleteSchedule(@RequestParam Long scheduleId) {
-
-        if (scheduleService.deleteScheduleById(scheduleId)) {
-            return ResponseEntity.status(HttpStatus.OK).body("Successful!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body("Unsuccessful!");
-        }
+    public Mono<Boolean> deleteSchedule(@RequestParam Long scheduleId) {
+        return scheduleService.deleteScheduleById(scheduleId);
     }
 
     @PutMapping("/schedule/{scheduleId}")
@@ -65,20 +61,13 @@ public class ScheduleController {
      * Test endpoint to see how to send timeslot objects
      */
     @PostMapping("/timeslot")
-    public ResponseEntity<TimeSlotEntity> addTimeSlot(@RequestParam Long scheduleId, @RequestBody TimeSlotDTO timeSlotDTO) {
-
-        TimeSlotEntity entity = scheduleService.addTimeSlot(scheduleId, timeSlotDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(entity);
+    public Mono<TimeSlotDTO> addTimeSlot(@RequestParam Long scheduleId, @RequestBody TimeSlotDTO timeSlotDTO) {
+        return Mono.justOrEmpty(timeSlotDTO);
     }
 
     @DeleteMapping("/timeslot")
-    public ResponseEntity<String> deleteTimeSlot(@RequestParam Long scheduleId, @RequestParam Long timeSlotId) {
-        System.out.println(scheduleId);
-        System.out.println(timeSlotId);
-        if (scheduleService.deleteTimeSlotFromSchedule(scheduleId, timeSlotId)) {
-            return ResponseEntity.status(HttpStatus.OK).body("Succesful!");
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Timeslot not found");
+    public Mono<Boolean> deleteTimeSlot(@RequestParam Long scheduleId, @RequestParam Long timeSlotId) {
+        return Mono.justOrEmpty(Boolean.FALSE);
     }
 
     @GetMapping("/error")
