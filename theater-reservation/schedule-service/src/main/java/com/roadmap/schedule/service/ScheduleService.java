@@ -15,6 +15,7 @@ import replys.Reply;
 import requests.Request;
 import requests.RequestType;
 import tools.jackson.databind.ObjectMapper;
+import util.MessageStatus;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -51,8 +52,9 @@ public class ScheduleService {
                         );
                     }
                     return sendMessage(movieId)
-                            .doOnNext( reply -> {LOG.info("Success in Movie Service {}", reply.getMessage());})
+                            .doOnNext( reply -> {LOG.info("Success in Movie Service {}", reply);})
                             .flatMap( reply -> {
+                                if (reply.getMessageStatus() == MessageStatus.FAILED) {return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND));}
                                 ScheduleEntity schedule = new ScheduleEntity();
                                 schedule.setMovieId(movieId);
                                 return scheduleRepository.save(schedule);

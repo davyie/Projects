@@ -20,6 +20,6 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request: " + "correlationId: " + correlationId + " message: " + message + " RequestType: " + requestType;
+        return "Request: " + "correlationId: " + correlationId + " message: " + message + " RequestType: " + requestType + " payload: " + payload.toString();
     }
 }

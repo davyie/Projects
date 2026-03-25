@@ -10,5 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleDTO {
-    private List<TimeSlotDTO> timeSlotList;
+    private Long id;
+    private Long movieId;
 }

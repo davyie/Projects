@@ -8,6 +8,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -43,7 +44,7 @@ public class ScheduleController {
 
     @PostMapping("/schedule/{movieId}")
     public Mono<ScheduleDTO> createSchedule(@PathVariable Long movieId) throws DuplicateEntryException {
-        return scheduleService.createSchedule(movieId);
+        return scheduleService.createSchedule(movieId).doOnError(e -> Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @DeleteMapping("/schedule")

@@ -15,11 +15,10 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
         <module name="movie-service" />
-        <module name="user-service" />
         <module name="common-lib" />
+        <module name="user-service" />
         <module name="rabbitmq" />
         <module name="schedule-service" />
         <module name="booking-service" />

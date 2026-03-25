@@ -4,6 +4,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -32,8 +33,13 @@ public class BookingController {
     // Delete booking
 
     @PostMapping("/")
-    public ResponseEntity<BookingDTO> createBooking(@RequestBody BookingDTO dto) {
-        bookingService.createBooking(dto);
-        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    public Mono<BookingDTO> createBooking(@RequestBody BookingDTO dto) {
+        return bookingService.createBooking(dto);
+//        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
+
+    @GetMapping("/all")
+    public Flux<BookingDTO> getAllBookings() {
+        return bookingService.getAllBookings();
     }
 }
